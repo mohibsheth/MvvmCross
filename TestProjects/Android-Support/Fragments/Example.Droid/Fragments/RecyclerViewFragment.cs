@@ -5,16 +5,16 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
-using MvvmCross.Platform.WeakSubscription;
+using Example.Core.ViewModels;
 using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Droid.Views.Attributes;
 using MvvmCross.Droid.Support.V4;
 using MvvmCross.Droid.Support.V7.RecyclerView;
-using Example.Core.ViewModels;
-using MvvmCross.Droid.Shared.Attributes;
+using MvvmCross.Platform.WeakSubscription;
 
 namespace Example.Droid.Fragments
 {
-    [MvxFragment(typeof(MainViewModel), Resource.Id.content_frame, true)]
+    [MvxFragmentPresentation(typeof(MainViewModel), Resource.Id.content_frame, true)]
     [Register("example.droid.fragments.RecyclerViewFragment")]
     public class RecyclerViewFragment : MvxFragment<RecyclerViewModel>
     {
@@ -32,6 +32,11 @@ namespace Example.Droid.Fragments
                 recyclerView.HasFixedSize = true;
                 var layoutManager = new LinearLayoutManager(Activity);
                 recyclerView.SetLayoutManager(layoutManager);
+                (recyclerView.Adapter as IMvxRecyclerAdapterBindableHolder).MvxViewHolderBound += (args) =>
+                {
+                    var item = args.Holder.ItemView;
+                    // you can access bound holder item here.
+                };
             }
 
             _itemSelectedToken = ViewModel.WeakSubscribe(() => ViewModel.SelectedItem,

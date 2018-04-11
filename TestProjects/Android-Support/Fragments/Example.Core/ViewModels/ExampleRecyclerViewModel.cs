@@ -1,8 +1,8 @@
-using MvvmCross.Core.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using MvvmCross.Core.ViewModels;
 
 namespace Example.Core.ViewModels
 {
@@ -13,35 +13,40 @@ namespace Example.Core.ViewModels
 
         public ExampleRecyclerViewModel()
         {
-            Items = new ObservableCollection<ListItem> {
-                new ListItem { Title = "title one" },
-                new ListItem { Title = "title two" },
-                new ListItem { Title = "title three" },
-                new ListItem { Title = "title four" },
-                new ListItem { Title = "title five" }
-            };
+            Items = new ObservableCollection<ListItem>();
+        }
+
+        public override void ViewAppeared()
+        {
+            base.ViewAppeared();
+
+            Task.Run(() =>
+            {
+                Items.Add(new ListItem { Title = "title one" });
+                Items.Add(new ListItem { Title = "title two" });
+                Items.Add(new ListItem { Title = "title three" });
+                Items.Add(new ListItem { Title = "title four" });
+                Items.Add(new ListItem { Title = "title five" });
+            });
         }
 
         private ObservableCollection<ListItem> _items;
-
         public ObservableCollection<ListItem> Items
         {
-            get { return _items; }
+            get
+            {
+                return _items;
+            }
             set
             {
-                _items = value;
-                RaisePropertyChanged(() => Items);
+                SetProperty(ref _items, value);
             }
         }
 
         public ListItem SelectedItem
         {
             get { return _selectedItem; }
-            set
-            {
-                _selectedItem = value;
-                RaisePropertyChanged(() => SelectedItem);
-            }
+            set { SetProperty(ref _selectedItem, value); }
         }
 
         public virtual ICommand ItemSelected
@@ -60,11 +65,7 @@ namespace Example.Core.ViewModels
         public virtual bool IsRefreshing
         {
             get { return _isRefreshing; }
-            set
-            {
-                _isRefreshing = value;
-                RaisePropertyChanged(() => IsRefreshing);
-            }
+            set { SetProperty(ref _isRefreshing, value); }
         }
 
         public ICommand ReloadCommand
@@ -90,7 +91,7 @@ namespace Example.Core.ViewModels
             var rand = new Random();
             Func<char> randChar = () => (char)rand.Next(65, 90);
             Func<int, string> randStr = null;
-            randStr = x => (x > 0) ? randStr(--x) + randChar() : "";
+            randStr = x => x > 0 ? randStr(--x) + randChar() : "";
 
             var newItemCount = rand.Next(3);
 
